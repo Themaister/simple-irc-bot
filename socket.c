@@ -2,12 +2,16 @@
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <string.h>
 
 int get_socket(const char* host, const char* port)
 {
    int rc;
    int s;
-   struct addrinfo hints, *servinfo;
+   struct addrinfo hints, *res;
 
    memset(&hints, 0, sizeof(hints));
 
@@ -44,7 +48,7 @@ int sck_send(int s, const char* data, size_t size)
 
    while ( written < size )
    {
-      rc = send(s, data + written, size - written);
+      rc = send(s, data + written, size - written, 0);
       if ( rc <= 0 )
          return -1;
 
