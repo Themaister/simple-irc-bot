@@ -60,26 +60,23 @@ int sck_send(int s, const char* data, size_t size)
 
 int sck_sendf(int s, const char *fmt, ...)
 {
-   char *args;
-   int snd_len;
-   char snd_buf[1024];
-
-   if (strlen(fmt) != 0)
+   if (strlen(fmt) != 0 )
    {
+      char send_buf[512];
+      int send_len;
+      char *args;
+
       // Format the data
       va_start(args, fmt);
-      snd_len = vsnprintf(snd_buf, sizeof (snd_buf) - 1, fmt, args);
+      send_len = vsnprintf(send_buf, sizeof (send_buf), fmt, args);
       va_end(args);
 
-      snd_buf[sizeof (snd_buf) - 1] = '\0'; // initial memset()'ing is slower
-
       // Clamp the chunk
-      if (snd_len < 0 || snd_len > (sizeof (snd_buf) - 1)) snd_len = strlen(snd_buf);
-      if (snd_len > 512) snd_len = 512;
-
-      if (sck_send( s, snd_buf, snd_len ) <= 0) return -1;
+      if (send_len > 512) send_len = 512;
+   
+      if (sck_send( s, snd_buf, snd_len ) <= 0) 
+         return -1;
    }
-
    return 0;
 }
 
