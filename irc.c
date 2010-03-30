@@ -29,7 +29,6 @@ int irc_leave_channel(irc_t *irc)
    return irc_part(irc->s, irc->channel);
 }
 
-// Here be dragons
 int irc_handle_data(irc_t *irc)
 {
    char tempbuffer[512];
@@ -94,6 +93,9 @@ int irc_parse_action(irc_t *irc)
       // Still don't care
       return 0;
    }
+   
+   // Here be lvl. 42 dragonn boss
+   // Parses IRC message that pulls out nick and message. 
    else
    {
       char *ptr;
