@@ -11,15 +11,15 @@ int main(int argc, char **argv)
       goto exit_err;
    }
 
-   irc_set_output(&irc, stdout);
+   irc_set_output(&irc, "/tmp/ircbot.log");
 
-   if ( irc_login(&irc, "maisterrofl") < 0 )
+   if ( irc_login(&irc, "maister_") < 0 )
    {
       fprintf(stderr, "Couldn't log in.\n");
       goto exit_err;
    }
 
-   if ( irc_join_channel(&irc, "#mplayer") < 0 )
+   if ( irc_join_channel(&irc, "#umgz") < 0 )
    {
       fprintf(stderr, "Couldn't join channel.\n");
       goto exit_err;

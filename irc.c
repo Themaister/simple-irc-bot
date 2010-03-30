@@ -1,6 +1,7 @@
 #include "socket.h"
 #include "irc.h"
 #include <string.h>
+#include <time.h>
 
 int irc_connect(irc_t *irc, const char* server, const char* port)
 {
@@ -21,6 +22,8 @@ int irc_login(irc_t *irc, const char* nick)
 
 int irc_join_channel(irc_t *irc, const char* channel)
 {
+   strncpy(irc->channel, channel, 254);
+   irc->channel[254] = '\0';
    return irc_join(irc->s, channel);
 }
 
@@ -104,6 +107,10 @@ int irc_parse_action(irc_t *irc)
       char irc_msg[512];
       *irc_nick = '\0';
       *irc_msg = '\0';
+
+      // Checks if we have non-message string
+      if ( strchr(irc->servbuf, 1) != NULL )
+         return 0;
    
       if ( irc->servbuf[0] == ':' )
       {
@@ -139,16 +146,31 @@ int irc_parse_action(irc_t *irc)
          
          if ( privmsg == 1 && strlen(irc_nick) > 0 && strlen(irc_msg) > 0 )
          {
-            fprintf(irc->file, "<%s> %s\n", irc_nick, irc_msg);
+            irc_log_message(irc, irc_nick, irc_msg);
          }
       }
    }
    return 0;
 }
 
-int irc_set_output(irc_t *irc, FILE *ofile)
+int irc_set_output(irc_t *irc, const char* file)
 {
-   irc->file = ofile;
+   irc->file = fopen(file, "w");
+   if ( irc->file == NULL )
+      return -1;
+   return 0;
+}
+
+int irc_log_message(irc_t *irc, const char* nick, const char* message)
+{
+   char timestring[128];
+   time_t curtime;
+   time(&curtime);
+   strftime(timestring, 127, "%F - %H:%M:%S", localtime(&curtime));
+   timestring[127] = '\0';
+
+   fprintf(irc->file, "%s - [%s] <%s> %s\n", irc->channel, timestring, nick, message);
+   fflush(irc->file);
 }
 
 void irc_close(irc_t *irc)

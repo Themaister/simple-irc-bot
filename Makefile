@@ -8,7 +8,7 @@ OBJECTS = main.o irc.o socket.o
 all: $(TARGET)
 
 %.o: %.c
-	$(CC) -g -c -o $@ $< $(CFLAGS)
+	$(CC) -g -c -o $@ $<
 
 clean: clean-obj clean-bin
 
