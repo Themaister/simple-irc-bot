@@ -11,7 +11,7 @@ int main(int argc, char **argv)
       goto exit_err;
    }
 
-   irc_set_output(&irc, "/tmp/ircbot.log");
+   irc_set_output(&irc, "/dev/stdout");
 
    if ( irc_login(&irc, "maister_") < 0 )
    {

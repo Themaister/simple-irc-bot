@@ -147,6 +147,8 @@ int irc_parse_action(irc_t *irc)
          if ( privmsg == 1 && strlen(irc_nick) > 0 && strlen(irc_msg) > 0 )
          {
             irc_log_message(irc, irc_nick, irc_msg);
+            if ( irc_reply_message(irc, irc_nick, irc_msg) < 0 )
+               return -1;
          }
       }
    }
@@ -158,6 +160,61 @@ int irc_set_output(irc_t *irc, const char* file)
    irc->file = fopen(file, "w");
    if ( irc->file == NULL )
       return -1;
+   return 0;
+}
+
+int irc_reply_message(irc_t *irc, char *irc_nick, char *msg)
+{
+   // Checks if someone calls on the bot.
+   if ( *msg != '!' )
+      return 0;
+
+   char *command;
+   char *arg;
+   // Gets command
+   command = strtok(&msg[1], " ");
+   arg = strtok(NULL, "");
+   if ( arg != NULL )
+      while ( *arg == ' ' )
+         arg++;
+
+   if ( command == NULL )
+      return 0;
+
+   if ( strcmp(command, "ping") == 0)
+   {
+      if ( irc_msg(irc->s, irc->channel, "pong") < 0)
+         return -1;
+   }
+   else if ( strcmp(command, "war") == 0 )
+   {
+      if ( irc_msg(irc->s, irc->channel, "WMs again? gtfo.") < 0 )
+         return -1;
+   }
+   else if ( strcmp(command, "smack") == 0 )
+   {
+      char mesg[512];
+      srand(time(NULL));
+      int critical;
+      critical = (rand()%10)/8;
+      
+      if ( arg != NULL && strlen(arg) > 0 )
+      {
+         if ( critical )
+            snprintf(mesg, 511, "I smack thee, %s, for %d damage (it's super effective).", arg, rand()%20 + 21);
+         else
+            snprintf(mesg, 511, "I smack thee, %s, for %d damage.", arg, rand()%20 + 1);
+         mesg[511] = '\0';
+      }
+      else
+      {
+         snprintf(mesg, 511, "Behold, I smack thee, %s, for %d damage.", irc_nick, rand()%20 + 1);
+         mesg[511] = '\0';
+      }
+      if ( irc_msg(irc->s, irc->channel, mesg) < 0 )
+         return -1;
+   }
+   
    return 0;
 }
 
