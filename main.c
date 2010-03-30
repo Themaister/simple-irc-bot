@@ -25,8 +25,7 @@ int main(int argc, char **argv)
       goto exit_err;
    }
    
-   while ( irc_handle_data(&irc) >= 0 )
-      fprintf(stderr, "Handled some data.\n");
+   while ( irc_handle_data(&irc) >= 0 );
 
    irc_close(&irc);
    return 0;
