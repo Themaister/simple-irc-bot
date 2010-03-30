@@ -3,8 +3,6 @@
 
 int main(int argc, char **argv)
 {
-   parse_args(argc, argv);
-
    irc_t irc;
 
    if ( irc_connect(&irc, "irc.freenode.org", "6667") < 0 )
@@ -14,6 +12,9 @@ int main(int argc, char **argv)
    }
 
    irc_set_output(&irc, stdout);
+
+   while ( irc_handle_data(&irc) >= 0 )
+      fprintf(stderr, "Handled some data.\n");
 
    if ( irc_login(&irc, "maister_*") < 0 )
    {
@@ -27,7 +28,8 @@ int main(int argc, char **argv)
       goto exit_err;
    }
    
-   while ( irc_handle_data(&irc) >= 0 );
+   while ( irc_handle_data(&irc) >= 0 )
+      fprintf(stderr, "Handled some data.\n");
 
    irc_close(&irc);
    return 0;

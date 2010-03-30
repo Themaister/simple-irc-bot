@@ -1,5 +1,6 @@
 #include "socket.h"
 #include "irc.h"
+#include <string.h>
 
 int irc_connect(irc_t *irc, const char* server, const char* port)
 {
@@ -25,7 +26,7 @@ int irc_join_channel(irc_t *irc, const char* channel)
 
 int irc_leave_channel(irc_t *irc)
 {
-   return irc_part(irc->s, "DUED?!");
+   return irc_part(irc->s, irc->channel);
 }
 
 // Here be dragons
@@ -35,7 +36,10 @@ int irc_handle_data(irc_t *irc)
    int rc, i;
 
    if ( (rc = sck_recv(irc->s, tempbuffer, sizeof(tempbuffer) - 2 ) ) <= 0 )
+   {
+      fprintf(stderr, ":v\n");
       return -1;
+   }
 
    tempbuffer[rc] = '\0';
 
@@ -49,7 +53,8 @@ int irc_handle_data(irc_t *irc)
             irc->servbuf[irc->bufptr] = '\0';
             irc->bufptr = 0;
 
-            irc_parse_action(irc);
+            if ( irc_parse_action(irc) < 0 )
+               return -1;
 
             break;
          }
@@ -68,6 +73,31 @@ int irc_handle_data(irc_t *irc)
    return 0;
 }
 
+int irc_parse_action(irc_t *irc)
+{
+
+   if ( strncmp(irc->servbuf, "PING :", 6) == 0 )
+   {
+      return irc_pong(irc->s, &irc->servbuf[6]);
+   }
+   else if ( strncmp(irc->servbuf, "NOTICE AUTH :", 13) == 0 )
+   {
+      // Don't care
+      return 0;
+   }
+   else if ( strncmp(irc->servbuf, "ERROR :", 7) == 0 )
+   {
+      // Still don't care
+      return 0;
+   }
+   else
+   {
+      // Usual message. Let's log this to file guise!
+      fprintf(irc->file, "%s\n", irc->servbuf);
+   }
+   return 0;
+}
+
 int irc_set_output(irc_t *irc, FILE *ofile)
 {
    irc->file = ofile;
@@ -78,10 +108,6 @@ void irc_close(irc_t *irc)
    close(irc->s);
    fclose(irc->file);
 }
-
-   
-   
-
 
 
 // irc_pong: For answering pong requests...
