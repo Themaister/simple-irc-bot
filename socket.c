@@ -33,6 +33,12 @@ int get_socket(const char* host, const char* port)
       goto error;
    }
 
+   if ( connect(s, res->ai_addr, res->ai_addrlen) < 0 )
+   {
+      fprintf(stderr, "Couldn't connect.\n");
+      goto error;
+   }
+
    freeaddrinfo(res);
    return s;
 
@@ -85,18 +91,12 @@ int sck_sendf(int s, const char *fmt, ...)
 
 int sck_recv(int s, char* buffer, size_t size)
 {
-   size_t _read;
    int rc;
 
-   while ( _read < size )
-   {
-      rc = read(s, buffer + _read, size - _read);
-      if ( rc <= 0 )
-         return -1;
+   rc = recv(s, buffer, size, 0);
+   if ( rc <= 0 )
+      return -1;
 
-      _read += rc;
-   }
-
-   return _read;
+   return rc;
 }
 

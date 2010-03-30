@@ -13,10 +13,7 @@ int main(int argc, char **argv)
 
    irc_set_output(&irc, stdout);
 
-   while ( irc_handle_data(&irc) >= 0 )
-      fprintf(stderr, "Handled some data.\n");
-
-   if ( irc_login(&irc, "maister_*") < 0 )
+   if ( irc_login(&irc, "maisterrofl") < 0 )
    {
       fprintf(stderr, "Couldn't log in.\n");
       goto exit_err;
