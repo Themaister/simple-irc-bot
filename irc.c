@@ -1,4 +1,62 @@
 #include "socket.h"
+#include "irc.h"
+
+int irc_connect(irc_t *irc, const char* server, const char* port)
+{
+   if ( (irc->s =  get_socket(server, port)) < 0 )
+   {
+      return -1;
+   }
+   
+   return 0;
+}
+
+int irc_login(irc_t *irc, const char* nick)
+{
+   return irc_reg(irc->s, nick, "arch", "HANSUDESU");
+}
+
+int irc_join_channel(irc_t *irc, const char* channel)
+{
+   return irc_join(irc->s, channel);
+}
+
+int irc_leave_channel(irc_t *irc, const char* data)
+{
+   return irc_part(irc->s, data);
+}
+
+// Here be dragons
+int irc_handle_data(irc_t *irc)
+{
+   char buffer[512 + 1];
+   size_t read_size = _something_;
+   int rc;
+
+   if ( (rc = sck_recv(irc->s, buffer, read_size) ) <= 0)
+      return -1;
+
+   buffer[rc] = '\0';
+
+   // DO STUFF HERE
+
+}
+
+int irc_set_output(irc_t *irc, FILE *ofile)
+{
+   irc->file = ofile;
+}
+
+void irc_close(irc_t *irc)
+{
+   close(irc->s);
+   fclose(irc->file);
+}
+
+   
+   
+
+
 
 // irc_pong: For answering pong requests...
 int irc_pong(int s, const char *data)

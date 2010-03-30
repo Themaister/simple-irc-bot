@@ -80,3 +80,20 @@ int sck_sendf(int s, const char *fmt, ...)
    return 0;
 }
 
+int sck_recv(int s, char* buffer, size_t size)
+{
+   size_t _read;
+   int rc;
+
+   while ( _read < size )
+   {
+      rc = read(s, buffer + _read, size - _read)
+      if ( rc <= 0 )
+         return -1;
+
+      _read += rc;
+   }
+
+   return _read;
+}
+
