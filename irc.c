@@ -75,6 +75,10 @@ int irc_handle_data(irc_t *irc)
 
 int irc_parse_action(irc_t *irc)
 {
+   
+   char irc_nick[128];
+   char irc_msg[512];
+
 
    if ( strncmp(irc->servbuf, "PING :", 6) == 0 )
    {
@@ -92,8 +96,50 @@ int irc_parse_action(irc_t *irc)
    }
    else
    {
-      // Usual message. Let's log this to file guise!
-      fprintf(irc->file, "%s\n", irc->servbuf);
+      char *ptr;
+      int privmsg = 0;
+      char irc_nick[128];
+      char irc_msg[512];
+      *irc_nick = '\0';
+      *irc_msg = '\0';
+   
+      if ( irc->servbuf[0] == ':' )
+      {
+         ptr = strtok(irc->servbuf, "!");
+         if ( ptr == NULL )
+         {
+            printf("ptr == NULL\n");
+            return 0;
+         }
+         else
+         {
+            strncpy(irc_nick, &ptr[1], 127);
+            irc_nick[127] = '\0';
+         }
+
+         while ( (ptr = strtok(NULL, " ")) != NULL )
+         {
+            if ( strcmp(ptr, "PRIVMSG") == 0 )
+            {
+               privmsg = 1;
+               break;
+            }
+         }
+
+         if ( privmsg )
+         {
+            if ( (ptr = strtok(NULL, ":")) != NULL && (ptr = strtok(NULL, "")) != NULL )
+            {
+               strncpy(irc_msg, ptr, 511);
+               irc_msg[511] = '\0';
+            }
+         }
+         
+         if ( privmsg == 1 && strlen(irc_nick) > 0 && strlen(irc_msg) > 0 )
+         {
+            fprintf(irc->file, "<%s> %s\n", irc_nick, irc_msg);
+         }
+      }
    }
    return 0;
 }
