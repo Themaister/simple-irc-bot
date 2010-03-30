@@ -5,7 +5,7 @@
 
 typedef struct
 {
-   int socket;
+   int s;
    FILE *file;
    char *channel;
    char *nick;

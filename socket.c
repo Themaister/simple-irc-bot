@@ -6,6 +6,7 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 int get_socket(const char* host, const char* port)
 {
@@ -60,22 +61,24 @@ int sck_send(int s, const char* data, size_t size)
 
 int sck_sendf(int s, const char *fmt, ...)
 {
+   char send_buf[512];
+   int send_len;
+   va_list args;
+
    if (strlen(fmt) != 0 )
    {
-      char send_buf[512];
-      int send_len;
-      char *args;
-
       // Format the data
       va_start(args, fmt);
       send_len = vsnprintf(send_buf, sizeof (send_buf), fmt, args);
       va_end(args);
 
       // Clamp the chunk
-      if (send_len > 512) send_len = 512;
+      if (send_len > 512) 
+         send_len = 512;
    
-      if (sck_send( s, snd_buf, snd_len ) <= 0) 
+      if (sck_send( s, send_buf, send_len ) <= 0) 
          return -1;
+      return send_len;
    }
    return 0;
 }
@@ -87,7 +90,7 @@ int sck_recv(int s, char* buffer, size_t size)
 
    while ( _read < size )
    {
-      rc = read(s, buffer + _read, size - _read)
+      rc = read(s, buffer + _read, size - _read);
       if ( rc <= 0 )
          return -1;
 

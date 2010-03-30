@@ -21,16 +21,16 @@ int irc_join_channel(irc_t *irc, const char* channel)
    return irc_join(irc->s, channel);
 }
 
-int irc_leave_channel(irc_t *irc, const char* data)
+int irc_leave_channel(irc_t *irc)
 {
-   return irc_part(irc->s, data);
+   return irc_part(irc->s, "DUED?!");
 }
 
 // Here be dragons
 int irc_handle_data(irc_t *irc)
 {
    char buffer[512 + 1];
-   size_t read_size = _something_;
+   size_t read_size = 512;
    int rc;
 
    if ( (rc = sck_recv(irc->s, buffer, read_size) ) <= 0)
