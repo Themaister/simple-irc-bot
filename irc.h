@@ -9,7 +9,7 @@ typedef struct
    FILE *file;
    char *channel;
    char *nick;
-   char tempbuf[512];
+   char servbuf[512];
    int bufptr;
 } irc_t; 
 
@@ -19,6 +19,7 @@ int irc_join_channel(irc_t *irc, const char* channel);
 int irc_leave_channel(irc_t *irc);
 int irc_handle_data(irc_t *irc);
 int irc_set_output(irc_t *irc, FILE *ofile);
+int irc_parse_action(irc_t *irc);
 void irc_close(irc_t *irc);
 
 // IRC Protocol

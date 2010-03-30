@@ -34,7 +34,7 @@ int irc_handle_data(irc_t *irc)
    char tempbuffer[512];
    int rc, i;
 
-   if ( (rc = sck_recv(irc->s, buffer, sizeof(buffer) - 2 ) ) <= 0 )
+   if ( (rc = sck_recv(irc->s, tempbuffer, sizeof(tempbuffer) - 2 ) ) <= 0 )
       return -1;
 
    tempbuffer[rc] = '\0';
@@ -46,22 +46,26 @@ int irc_handle_data(irc_t *irc)
          case '\r':
          case '\n':
          {
-            irc->servbuffer[irc->bufptr] = '\0';
+            irc->servbuf[irc->bufptr] = '\0';
             irc->bufptr = 0;
-            // Handle data here
+
+            irc_parse_action(irc);
+
             break;
          }
 
          default:
          {
-            irc->servbuffer[irc->bufptr] = tempbuffer[i];
-            if ( irc->bufpos >= (sizeof ( irc->servbuffer) -1 ) )
+            irc->servbuf[irc->bufptr] = tempbuffer[i];
+            if ( irc->bufptr >= (sizeof ( irc->servbuf ) -1 ) )
                // Overflow!
+               ;
             else
                irc->bufptr++;
          }
       }
    }
+   return 0;
 }
 
 int irc_set_output(irc_t *irc, FILE *ofile)
