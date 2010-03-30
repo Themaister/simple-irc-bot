@@ -9,6 +9,8 @@ typedef struct
    FILE *file;
    char *channel;
    char *nick;
+   char tempbuf[512];
+   int bufptr;
 } irc_t; 
 
 int irc_connect(irc_t *irc, const char* server, const char* port);

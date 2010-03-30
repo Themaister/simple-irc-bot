@@ -7,6 +7,8 @@ int irc_connect(irc_t *irc, const char* server, const char* port)
    {
       return -1;
    }
+
+   irc->bufptr = 0;
    
    return 0;
 }
@@ -29,17 +31,37 @@ int irc_leave_channel(irc_t *irc)
 // Here be dragons
 int irc_handle_data(irc_t *irc)
 {
-   char buffer[512 + 1];
-   size_t read_size = 512;
-   int rc;
+   char tempbuffer[512];
+   int rc, i;
 
-   if ( (rc = sck_recv(irc->s, buffer, read_size) ) <= 0)
+   if ( (rc = sck_recv(irc->s, buffer, sizeof(buffer) - 2 ) ) <= 0 )
       return -1;
 
-   buffer[rc] = '\0';
+   tempbuffer[rc] = '\0';
 
-   // DO STUFF HERE
+   for ( i = 0; i < rc; ++i )
+   {
+      switch (tempbuffer[i])
+      {
+         case '\r':
+         case '\n':
+         {
+            irc->servbuffer[irc->bufptr] = '\0';
+            irc->bufptr = 0;
+            // Handle data here
+            break;
+         }
 
+         default:
+         {
+            irc->servbuffer[irc->bufptr] = tempbuffer[i];
+            if ( irc->bufpos >= (sizeof ( irc->servbuffer) -1 ) )
+               // Overflow!
+            else
+               irc->bufptr++;
+         }
+      }
+   }
 }
 
 int irc_set_output(irc_t *irc, FILE *ofile)
