@@ -13,12 +13,18 @@ int main(int argc, char **argv)
       goto exit_err;
    }
 
-   if ( irc_login(irc, name, channel) < 0 )
+   if ( irc_login(irc, nick) < 0 )
    {
       fprintf(stderr, "Couldn't log in.\n");
       goto exit_err;
    }
 
+   if ( irc_join_channel(irc, channel) < 0 )
+   {
+      fprintf(stderr, "Couldn't join channel.\n");
+      goto exit_err;
+   }
+   
    while ( irc_handle_data(irc) >= 0 );
 
    irc_close(irc);

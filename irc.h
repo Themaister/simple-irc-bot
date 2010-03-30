@@ -1,6 +1,25 @@
 #ifndef __IRC_H
 #define __IRC_H
 
+#include <stdio.h>
+
+typedef struct
+{
+   int socket;
+   FILE *file;
+   char *channel;
+   char *nick;
+} irc_t; 
+
+int irc_connect(irc_t **irc, const char* server, const char* port);
+int irc_login(irc_t *irc, const char* nick);
+int irc_join_channel(irc_t *irc, const char* channel);
+int irc_leave_channel(irc_t *irc);
+int irc_handle_data(irc_t *irc);
+int irc_set_output(FILE *ofile);
+void irc_close(irc_t *irc);
+
+// IRC Protocol
 int irc_pong(int s, const char *pong);
 int irc_reg(int s, const char *nick, const char *username, const char *fullname);
 int irc_join(int s, const char *channel);
