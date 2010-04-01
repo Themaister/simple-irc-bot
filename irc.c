@@ -214,6 +214,59 @@ int irc_reply_message(irc_t *irc, char *irc_nick, char *msg)
       if ( irc_msg(irc->s, irc->channel, mesg) < 0 )
          return -1;
    }
+   else if ( strcmp(command, "pacman") == 0 )
+   {
+      if ( irc_msg(irc->s, irc->channel, "Wocka, wocka, bitches!") < 0 )
+         return -1;
+   }
+   else if ( strcmp(command, "google") == 0 )
+   {
+      char mesg[512];
+
+      char t_nick[128];
+      char t_link[256];
+      char link[256] = {0};
+
+      char *t_arg = strtok(arg, " ");
+      if ( t_arg )
+      {
+         strncpy(t_nick, t_arg, 127);
+         t_nick[127] = '\0';
+      }
+      else
+         return 0;
+
+      t_arg = strtok(NULL, "");
+      if ( t_arg )
+      {
+         while ( *t_arg == ' ' )
+            t_arg++;
+
+         strncpy(t_link, t_arg, 255);
+         t_link[255] = '\0';
+      }
+      else
+         return 0;
+
+      t_arg = strtok(t_link, " ");
+      while ( t_arg )
+      {
+         strncpy(&link[strlen(link)], t_arg, 254 - strlen(link));
+
+         t_arg = strtok(NULL, " ");
+         if ( !t_arg )
+            break;
+
+         strncpy(&link[strlen(link)], "%20", 254 - strlen(link));
+      }
+
+
+
+      snprintf(mesg, 511, "%s: http://lmgtfy.com/?q=%s", t_nick, link);
+      mesg[511] = '\0';
+      if ( irc_msg(irc->s, irc->channel, mesg) < 0 )
+         return -1;
+   }
    
    return 0;
 }
