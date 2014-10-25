@@ -281,6 +281,8 @@ int irc_log_message(irc_t *irc, const char* nick, const char* message)
 
    fprintf(irc->file, "%s - [%s] <%s> %s\n", irc->channel, timestring, nick, message);
    fflush(irc->file);
+   
+   return 0;
 }
 
 void irc_close(irc_t *irc)
